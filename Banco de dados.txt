@@ -1,0 +1,47 @@
+-- Criação do Banco de Dados (se necessário)
+CREATE DATABASE kanban;
+
+-- Conectar ao banco de dados
+\c kanban;
+
+-- Criação da Tabela Usuário
+CREATE TABLE usuario (
+    id_usuario SERIAL PRIMARY KEY,    -- Chave Primária e auto incremento
+    nome VARCHAR(100) NOT NULL,       -- Nome do usuário
+    email VARCHAR(100) NOT NULL UNIQUE -- Email único para cada usuário
+);
+
+-- Criação da Tabela Tarefa
+CREATE TABLE tarefa (
+    id_tarefa SERIAL PRIMARY KEY,    -- Chave Primária e auto incremento
+    id_usuario INT NOT NULL,         -- Chave estrangeira para o Usuário
+    descricao TEXT NOT NULL,         -- Descrição da tarefa
+    setor VARCHAR(100) NOT NULL,     -- Setor responsável pela tarefa
+    prioridade VARCHAR(10) NOT NULL, -- Prioridade da tarefa (baixa, média, alta)
+    data_cadastro TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Data de cadastro
+    status VARCHAR(10) NOT NULL DEFAULT 'a fazer',  -- Status da tarefa (a fazer, fazendo, pronto)
+    CONSTRAINT fk_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) -- Relacionamento com a tabela Usuario
+);
+
+-- Adicionando índices para melhorar a performance de buscas (opcional)
+CREATE INDEX idx_status_tarefa ON tarefa(status);
+CREATE INDEX idx_prioridade_tarefa ON tarefa(prioridade);
+
+-- Inserir dados de exemplo
+
+-- Inserindo um usuário
+INSERT INTO usuario (nome, email) 
+VALUES ('João da Silva', 'joao.silva@email.com'),
+       ('Maria Oliveira', 'maria.oliveira@email.com');
+
+-- Inserindo algumas tarefas para o João
+INSERT INTO tarefa (id_usuario, descricao, setor, prioridade, status)
+VALUES 
+    (1, 'Finalizar relatório de vendas', 'Financeiro', 'alta', 'a fazer'),
+    (1, 'Reunião com o cliente X', 'Comercial', 'média', 'fazendo');
+
+-- Inserindo algumas tarefas para a Maria
+INSERT INTO tarefa (id_usuario, descricao, setor, prioridade, status)
+VALUES 
+    (2, 'Organizar treinamento de equipe', 'RH', 'baixa', 'pronto'),
+    (2, 'Ajustar orçamento para novo projeto', 'Financeiro', 'alta', 'a fazer');
